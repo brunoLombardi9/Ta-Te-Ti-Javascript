@@ -2,10 +2,13 @@
 
 const celdas = document.querySelectorAll('[data-celdas]');
 const tablero = document.querySelector('.container');
+const finDePartida = document.querySelector('#finDePartida');
+const reiniciar = document.querySelector('#reiniciar');
+const texto = document.querySelector('#texto');
 let jugadorActual = "jugador-1"; //jugador 1 por default
 let turno = 0;
 let ganador = false;
-const empate = false; // empate false por default
+let empate = false; // empate false por default
 const combinacionesGanadoras = [
   // horizontales
   [0, 1, 2],
@@ -40,7 +43,7 @@ function cambioDeJugador() {
     tablero.classList.add('jugador-1');
     jugadorActual = "jugador-1";
   }
-  turno ++;
+  turno++;
 }
 
 function comprobarGanador() {
@@ -48,21 +51,48 @@ function comprobarGanador() {
   jugadorActual === "jugador-1" ? clase = "x" : clase = "circulo";
   if (combinacionesGanadoras.some(combinacion => {
       return combinacion.every(index => {
-        return celdas[index].classList.contains(clase);})})) {ganador = true}
+        return celdas[index].classList.contains(clase);
+      })
+    })) {
+    ganador = true
+  }
 }
 
+function reset() {
+  celdas.forEach(celda => {
+    celda.classList.remove('x');
+    celda.classList.remove('circulo');
+  });
+  texto.innerText = "";
+  finDePartida.classList.remove('mostrar');
+  finDePartida.classList.add('esconder');
+  ganador = false;
+  empate = false;
+  turno = 0;
+  if (tablero.classList.contains('jugador-2')) {
+    tablero.classList.remove('jugador-2');
+    tablero.classList.add('jugador-1');
+  }
+}
+
+function cartelFinDePartida() {
+  finDePartida.classList.remove('esconder');
+  finDePartida.classList.add('mostrar');
+}
 
 function clickHandler(celda) {
   if (celda.classList.contains("x") || celda.classList.contains("circulo")) return;
   pintar(celda);
   comprobarGanador();
   if (ganador === true) {
-    console.log("gano " + jugadorActual);
+    cartelFinDePartida()
+    texto.innerText = `Ganó ${jugadorActual}`;
   } else {
     cambioDeJugador();
   }
-  if(turno === 9 && ganador === false){
-    console.log("empate");
+  if (turno === celdas.length && ganador === false) {
+    cartelFinDePartida()
+    texto.innerText = 'Empate';
   }
 }
 
@@ -71,4 +101,8 @@ celdas.forEach(celda => {
   celda.addEventListener('click', () => {
     clickHandler(celda);
   });
+});
+
+reiniciar.addEventListener('click', () => {
+  reset();
 });
