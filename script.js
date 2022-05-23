@@ -5,7 +5,7 @@ const tablero = document.querySelector('.container');
 const finDePartida = document.querySelector('#finDePartida');
 const reiniciar = document.querySelector('#reiniciar');
 const texto = document.querySelector('#texto');
-let jugadorActual = "jugador-1"; //jugador 1 por default
+let jugadorActual = 'jugador-1'; //jugador 1 por default
 let turno = 0;
 let ganador = false;
 let empate = false; // empate false por default
@@ -26,18 +26,19 @@ const combinacionesGanadoras = [
 // FUNCIONES ----------------------------------------------------------------------------------------------------------
 
 function pintar(casillero) {
-  if (jugadorActual === "jugador-1") {
-    casillero.classList.add("x");
+  if (casillero.classList.contains('x') || casillero.classList.contains('circulo')) return;
+  if (jugadorActual === 'jugador-1') {
+    casillero.classList.add('x');
   } else {
     casillero.classList.add("circulo");
   }
 }
 
 function cambioDeJugador() {
-  if (jugadorActual === "jugador-1") {
+  if (jugadorActual === 'jugador-1') {
     tablero.classList.remove('jugador-1');
     tablero.classList.add('jugador-2');
-    jugadorActual = "jugador-2";
+    jugadorActual = 'jugador-2';
   } else {
     tablero.classList.remove('jugador-2');
     tablero.classList.add('jugador-1');
@@ -48,14 +49,13 @@ function cambioDeJugador() {
 
 function comprobarGanador() {
   let clase
-  jugadorActual === "jugador-1" ? clase = "x" : clase = "circulo";
-  if (combinacionesGanadoras.some(combinacion => {
+  jugadorActual === 'jugador-1' ? clase = 'x' : clase = 'circulo';
+  const combinacionGanadora = combinacionesGanadoras.some(combinacion => {
       return combinacion.every(index => {
         return celdas[index].classList.contains(clase);
-      })
-    })) {
-    ganador = true
-  }
+      });
+    });
+  if(combinacionGanadora){ganador = true}
 }
 
 function reset() {
@@ -72,6 +72,7 @@ function reset() {
   if (tablero.classList.contains('jugador-2')) {
     tablero.classList.remove('jugador-2');
     tablero.classList.add('jugador-1');
+    jugadorActual = 'jugador-1';
   }
 }
 
@@ -80,11 +81,8 @@ function cartelFinDePartida() {
   finDePartida.classList.add('mostrar');
 }
 
-function clickHandler(celda) {
-  if (celda.classList.contains("x") || celda.classList.contains("circulo")) return;
-  pintar(celda);
-  comprobarGanador();
-  if (ganador === true) {
+function finalizarPartida() {
+  if (ganador) {
     cartelFinDePartida()
     texto.innerText = `Ganó ${jugadorActual}`;
   } else {
@@ -94,6 +92,12 @@ function clickHandler(celda) {
     cartelFinDePartida()
     texto.innerText = 'Empate';
   }
+}
+
+function clickHandler(celda) {
+  pintar(celda);
+  comprobarGanador();
+  finalizarPartida();
 }
 
 // EVENTOS ----------------------------------------------------------------------------------------------------------
